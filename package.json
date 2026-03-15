@@ -1,0 +1,12 @@
+{
+  "name": "three-amigos",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "Turn-based card game where players take turns playing cards from their hand and table until a player has no more cards to play. The game is designed for 2-4 players and combines strategy with luck.",
+  "main": "three-amigos.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Rui Viveiros",
+  "license": "ISC"
+}

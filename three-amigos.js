@@ -1,27 +1,7 @@
-const game = {
-  play() {
-    console.log("Play a card");
-  },
-  chooseNext() {
-    console.log("Choose the next player to play");
-  },
-  next() {
-    console.log("Move to the next player");
-  },
-  playMinor() {
-    console.log("Play a minor card");
-  },
-  blocked() {
-    console.log("Block the next player");
-  },
-  clean() {
-    console.log("Clean the board");
-  },
-};
-
 // ---------------------------------------------------------------
+const modules = {};
 
-class Card {
+export class Card {
   constructor(value, suit, x, y) {
     this.value = value;
     this.suit = suit;
@@ -52,7 +32,7 @@ class Card {
 
 // ---------------------------------------------------------------
 
-class Deck {
+export class Deck {
   constructor() {
     this.cards = [];
     this.discardPile = [];
@@ -102,14 +82,7 @@ class Deck {
   }
 }
 
-const deck = new Deck();
-const player1Hand = deck.draw(5);
-game.play = function () {
-  const card = deck.draw();
-  // … handle card …
-};
-
-class Player {
+export class Player {
   constructor(name) {
     this.name = name;
     this.hand = [];
@@ -118,8 +91,10 @@ class Player {
     this.score = 0;
   }
   drawCard(deck) {
+    if (this.hand <= 3)
     this.hand.push(deck.draw());
   }
+
   playCard(pile, index) {
     let card;
     if (pile === 'hand') {
@@ -133,7 +108,7 @@ class Player {
   }
 }
 
-class Game {
+export class Game {
   constructor(playerNames, deck) {
     this.players = playerNames.map((name) => new Player(name));
     this.deck = deck;
@@ -157,9 +132,15 @@ class Game {
 
     for (const player of this.players) {
       const hand = this.deck.draw(3);
+      const faceUp = this.deck.draw(3);
+      const faceDown = this.deck.draw(3);
       player.hand.push(...hand);
+      player.faceDown.push(...faceDown);
+      player.faceUp.push(...faceUp);
     }
-    console.log(`Game started! ${this.players.map((p) => p.name).join(", ")}`);
+    console.log(`Game started! ${this.players.map((p) => p.name).join(" vs ")}`);
     console.log(`${this.currentPlayer.name}'s turn.`);
   }
 }
+
+modules.exports = { Card, Deck, Player, Game };
