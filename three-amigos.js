@@ -2,14 +2,9 @@
 const modules = {};
 
 export class Card {
-  constructor(value, suit, x, y) {
+  constructor(value, suit) {
     this.value = value;
     this.suit = suit;
-    this.x = x;
-    this.y = y;
-    this.width = 80;
-    this.height = 120;
-    this.faceUp = true;
   }
   specialPower = () => {
     switch (this.value) {
@@ -22,8 +17,7 @@ export class Card {
       case 8:
         return game.blocked();
       case 10:
-        game.clean();
-        return game.play();
+        return game.clean()
       default:
         return false;
     }
@@ -35,7 +29,8 @@ export class Card {
 export class Deck {
   constructor() {
     this.cards = [];
-    this.discardPile = [];
+    this.pile = [];
+    this.discardedPile = [];
     this._build();
   }
   _build() {
@@ -44,7 +39,7 @@ export class Deck {
 
     for (const suit of suits) {
       for (const value of values) {
-        this.cards.push(new Card(value, suit, 0, 0));
+        this.cards.push(new Card(value, suit));
       }
     }
   }
@@ -65,17 +60,13 @@ export class Deck {
     }
     return hand;
   }
-
-  peek() {
-    return this.cards[this.cards.length - 1];
-  }
   reset() {
     this.cards.length = 0;
     this._build();
     return this.shuffle();
   }
   discard(card) {
-    this.discardPile.push(card);
+    this.discardedPile.push(card);
   }
   get size() {
     return this.cards.length;
