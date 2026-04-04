@@ -1,90 +1,581 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
 html {
-    font-size: larger;
-    padding: 1em;
+  font-size: 16px;
+  padding: 1rem;
+  background: #1a472a;
+  color: #fff;
+  min-height: 100vh;
 }
 
-button {
-    padding: 0.5rem 0.8rem;
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+h1 {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.tagline {
+  color: #a8d5ba;
+  font-size: 1.1rem;
+}
+
+/* Hidden class */
+.hidden {
+  display: none !important;
+}
+
+/* Setup Screen */
+#setup-screen {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+}
+
+.setup-container {
+  background: #2d5a3d;
+  padding: 1.5rem;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.setup-container h2 {
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+}
+
+.player-count {
+  margin-bottom: 1.5rem;
+}
+
+.player-count label {
+  display: block;
+  margin-bottom: 0.75rem;
+  font-size: 1rem;
+}
+
+.player-buttons {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+}
+
+.player-btn, button {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  background: #4a7c59;
+  color: white;
+  border: 2px solid #3d6b4a;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex: 1;
+  max-width: 100px;
+}
+
+.player-name-input input {
+  padding: 0.5rem;
+  border: 2px solid #3d6b4a;
+  border-radius: 6px;
+  background: #1a472a;
+  color: white;
+  width: 120px;
+  font-size: 0.9rem;
+}
+
+.player-btn:hover, button:hover {
+  background: #5a8c69;
+  transform: translateY(-2px);
+}
+
+.player-btn.selected {
+  background: #367d59;
+  border-color: #2d6a4a;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.player-names {
+  margin-bottom: 1.5rem;
+}
+
+.player-name-input {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  justify-content: center;
+}
+
+.player-name-input input {
+  padding: 0.5rem;
+  border: 2px solid #3d6b4a;
+  border-radius: 6px;
+  background: #1a472a;
+  color: white;
+  width: 150px;
+}
+
+.player-name-input input::placeholder {
+  color: #8ab89a;
+}
+
+#start-game-btn {
+  background: #367d59;
+  font-size: 1.1rem;
+  padding: 1rem 2rem;
+}
+
+/* Game Screen */
+#game-screen {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.game-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #2d5a3d;
+  padding: 1rem 1.5rem;
+  border-radius: 10px;
+}
+
+.turn-indicator {
+  font-size: 1.3rem;
+  font-weight: bold;
+}
+
+.game-controls {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.game-controls button {
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+}
+
+#pickup-btn {
+  background: #7d3636;
+}
+
+#pickup-btn:hover {
+  background: #9d4646;
+}
+
+.game-board {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Opponents Area */
+.opponents-area {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.opponent {
+  background: #2d5a3d;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  text-align: center;
+  min-width: 200px;
+}
+
+.opponent-name {
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.opponent-cards {
+  display: flex;
+  gap: 0.25rem;
+  justify-content: center;
+}
+
+/* Center Area */
+.center-area {
+  display: flex;
+  justify-content: center;
+  gap: 3rem;
+  padding: 1.5rem;
+  background: #1e3d2a;
+  border-radius: 12px;
+}
+
+.pile-container, .deck-container {
+  text-align: center;
+}
+
+.pile-label, .deck-label {
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+  color: #a8d5ba;
+}
+
+.pile, .deck {
+  width: 80px;
+  height: 112px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pile {
+  background: linear-gradient(135deg, #8b4513, #654321);
+  border: 3px solid #5a3a1a;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  flex-wrap: wrap;
+  gap: 2px;
+  padding: 4px;
+  align-content: center;
+}
+
+.pile .card {
+  width: 36px;
+  height: 50px;
+  font-size: 0.7rem;
+  margin: 0;
+}
+
+.deck {
+  background: linear-gradient(135deg, #2d5a3d, #1a3d2a);
+  border: 3px solid #367d59;
+}
+
+/* Cards */
+.card {
+  width: 60px;
+  height: 84px;
+  background: white;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  margin: 2px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  user-select: none;
+  color: #333;
+}
+
+.card:hover:not(.face-down):not(.disabled) {
+  transform: translateY(-8px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+}
+
+.card.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.card.selected {
+  transform: translateY(-12px);
+  box-shadow: 0 8px 16px rgba(54, 125, 89, 0.5);
+  outline: 3px solid #367d59;
+}
+
+.card.face-down {
+  background: linear-gradient(135deg, #4a7c59, #367d59);
+  cursor: default;
+}
+
+.card.face-up-placeholder {
+  background: white;
+  border: 2px dashed #ccc;
+}
+
+.pile-card {
+  background: white;
+  color: #333;
+}
+
+.card-value {
+  font-size: 1.4rem;
+  font-weight: bold;
+}
+
+.card-suit {
+  font-size: 1.2rem;
+}
+
+.card.hearts, .card.diamonds {
+  color: #c41e3a;
+}
+
+.card.clubs, .card.spades {
+  color: #1a1a1a;
+}
+
+/* Current Player Area */
+.current-player-area {
+  background: #2d5a3d;
+  padding: 1rem 1.5rem;
+  border-radius: 10px;
+}
+
+.player-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.player-name {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.card-count {
+  color: #a8d5ba;
+  font-size: 0.9rem;
+}
+
+.player-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.card-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.section-label {
+  width: 80px;
+  font-size: 0.9rem;
+  color: #a8d5ba;
+}
+
+.card-row {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+/* Status Message */
+.status-message {
+  text-align: center;
+  padding: 1rem;
+  background: #2d5a3d;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  min-height: 3.5rem;
+}
+
+.status-message.error {
+  background: #7d3636;
+}
+
+.status-message.success {
+  background: #367d59;
+}
+
+/* Modal */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: #2d5a3d;
+  padding: 2.5rem;
+  border-radius: 16px;
+  text-align: center;
+  box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+}
+
+.modal-content h2 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.modal-content p {
+  margin-bottom: 1.5rem;
+  font-size: 1.1rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  html {
+    font-size: 14px;
+    padding: 0.5rem;
+  }
+
+  h1 {
+    font-size: 1.8rem;
+  }
+
+  .game-header {
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 0.75rem;
+  }
+
+  .turn-indicator {
+    font-size: 1.1rem;
+  }
+
+  .game-controls {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .game-controls button {
+    flex: 1;
+    padding: 0.6rem;
+    font-size: 0.85rem;
+  }
+
+  /* Opponents Area */
+  .opponents-area {
+    gap: 0.75rem;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .opponent {
+    min-width: 95%;
+    max-width: 300px;
+    padding: 0.5rem 0.75rem;
+  }
+
+  .opponent-name {
+    font-size: 0.9rem;
+  }
+
+  .opponent-cards {
+    gap: 0.15rem;
+  }
+
+  /* Center Area */
+  .center-area {
+    gap: 1.5rem;
+    padding: 1rem;
+  }
+
+  .pile, .deck {
+    width: 60px;
+    height: 84px;
+  }
+
+  /* Cards */
+  .card {
+    width: 48px;
+    height: 67px;
+  }
+
+  .card-value {
+    font-size: 1.2rem;
+  }
+
+  .card-suit {
     font-size: 1rem;
-    background: #367d59;
-    color: white;
-    border: 2px solid black;
-    border-radius: 6px;
-    box-shadow: 0 5px black;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+  }
+
+  /* Current Player Area */
+  .current-player-area {
+    padding: 0.75rem;
+  }
+
+  .player-cards {
+    gap: 0.75rem;
+  }
+
+  .card-section {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .section-label {
+    width: auto;
+    font-size: 0.8rem;
+  }
+
+  .card-row {
+    gap: 0.35rem;
+  }
+
+  /* Status Message */
+  .status-message {
+    font-size: 0.95rem;
+    padding: 0.75rem;
+    min-height: 2.5rem;
+  }
+
+  /* Modal */
+  .modal-content {
+    margin: 1rem;
+    padding: 1.5rem;
+  }
+
+  .modal-content h2 {
+    font-size: 1.5rem;
+  }
 }
 
-/* Accordion Styles */
+@media (max-width: 480px) {
+  .card {
+    width: 42px;
+    height: 58px;
+  }
 
-summary {
-    display: block;
-}
+  .card-value {
+    font-size: 1rem;
+  }
 
-summary::-webkit-details-marker {
-    display: none;
-}
+  .card-suit {
+    font-size: 0.85rem;
+  }
 
-span {
-    display: flex;
-    justify-content: space-between;
-}
+  .pile, .deck {
+    width: 50px;
+    height: 70px;
+  }
 
-span:after {
-    content: "\276F";
-    transform: rotate(90deg);
-    transition: transform 0.3s ease;
-}
+  .game-controls button {
+    padding: 0.5rem;
+    font-size: 0.8rem;
+  }
 
-.content {
-    display: grid;
-    grid-template-rows: 0fr;
-    transition: grid-template-rows 0.3s ease, padding 0.3s ease;
-}
-
-.inner {
-    overflow: hidden;
-    margin: 0;
-}
-
-details[open]+.content {
-    grid-template-rows: 1fr;
-    padding: 10px;
-}
-
-details[open] span:after {
-    transform: rotate(270deg);
-}
-
-.accordion {
-    margin-bottom: 1em;
-    box-shadow: 0 5px black;
-    border-radius: 6px;
-    border: 2px solid black;
-    overflow: clip;
-
-    transition-property: all;
-    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-    transition-duration: 0.15s;
-}
-
-.accordion:has(details[open]),
-.accordion:hover,
-.accordion:has(summary:focus) {
-    box-shadow: 0 0 var(--black);
-    transform: translateY(6px);
-}
-
-
-span {
-    /* font-size: 1.1em; */
-    /* background: #367d59; */
-    /* font-weight: 500; */
-    cursor: pointer;
-    /* color: white; */
-    padding: 0.5rem 0.8rem;
-}
-
-.content {
-    padding: 0 10px;
+  #pickup-btn {
+    background: #7d3636;
+    min-width: 80px;
+  }
 }

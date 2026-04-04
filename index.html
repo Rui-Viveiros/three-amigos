@@ -7,100 +7,96 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="title" content="Three Amigos - Card Game" />
-    <meta
-      name="description"
-      content="
-            Turn-based card game where players take turns playing cards from their hand and table until a
-            player has no more cards to play. The game is designed for 2-4 players and combines strategy with luck."
-    />
     <meta name="author" content="Rui Viveiros" />
 
     <title>Three Amigos</title>
   </head>
-  <header>
-    <nav>
-      <a href="">&larr; back</a>
-    </nav>
-    <h1>Three Amigos</h1>
-    <p>
-      Turn-based card game where players take turns playing cards from their
-      hand and table until a player has no more cards to play. The game is designed
-      for 2-4 players and combines strategy with luck.
-    </p>
-  </header>
   <body>
-    <div class="accordion">
-      <details name="super">
-        <summary aria-describedby="accordion1">
-          <span role="term">How to Play</span>
-        </summary>
-      </details>
+    <header>
+      <h1>Three Amigos</h1>
+      <p class="tagline">Be the first to empty your hand and table!</p>
+    </header>
 
-      <div class="content">
-        <p class="inner" role="definition" id="accordion">
-        Each player starts with a total of 9 cards: a hand of 3 cards and table of 6 cards placed in a 
-        1x3 grid
-        <br><br>
-        The top 3 cards of the grid are visible to all players and can only be played once a player has no more
-        cards in their hand.
-        <br><br> 
-        The bottom 3 cards of the grid are hidden to all players and can only be played after the 3 top 
-        cards. This means that players can only see the top cards of their table and must play them before 
-        they can access the next cards below.
-        <br><br>
-        Players take turns playing cards from their hand to the main pile in the center of the table. After 
-        their turn, they draw a card from the deck to replenish their hand.
-        <br><br>
-        Cards must be played in ascending order, meaning that the card played must be of equal or higher 
-        value than the card on top of the pile. If a player cannot play a card, he must draw the pile 
-        and end his turn.
-        <br><br>
-        If a player has cards of equal value he can play them together in a single turn. If all 4 cards 
-        played in a turn are of the same value, the pile is cleared and removed from the game, and the player 
-        can play another card immediately.
-        <br><br>
-        If a player's turn results in the pile having 4 cards of the same value, the pile is cleared and 
-        removed from the game, and the player can play another card immediately.
-        </p>
-      </div>
+    <!-- Setup Screen -->
+    <div id="setup-screen">
+      <div class="setup-container">
+        <h2>Start New Game</h2>
+        <div class="player-count">
+          <label>Number of Players:</label>
+          <div class="player-buttons">
+            <button class="player-btn" data-count="2">2</button>
+            <button class="player-btn" data-count="3">3</button>
+            <button class="player-btn" data-count="4">4</button>
+          </div>
+        </div>
+        <div id="player-names" class="player-names hidden"></div>
+        <button id="start-game-btn" class="hidden">Start Game</button>
       </div>
     </div>
 
-    <div class="accordion">
-      <details name="super">
-        <summary aria-describedby="accordion2">
-          <span role="term">Special Card Powers</span>
-        </summary>
-      </details>
-
-      <div class="content">
-        <p class="inner" role="definition" id="accordion2">
-            Some cards have special powers that can affect the game:<br><br>
-            <b>1</b> - Can be played on any card except 7 and forces a chosen player to play.<br>
-            <b>2</b> - Can be played on any card and resets the pile to 0.<br>
-            <b>7</b> - Forces the next player to play a card of value 6 or lower.<br>
-            <b>8</b> - Forces the next player to skip their turn.<br>
-            <b>10</b> - Clears the pile, removing all cards from the game. Player can play another card immediately.<br>
-
-        </p>
+    <!-- Game Screen -->
+    <div id="game-screen" class="hidden">
+      <div class="game-header">
+        <div class="turn-indicator">
+          <span id="current-player-name"></span>'s Turn
+        </div>
+        <div class="game-controls">
+          <button id="pickup-btn">Pick Up Pile</button>
+          <button id="end-turn-btn">End Turn</button>
+          <button id="new-game-btn">New Game</button>
+        </div>
       </div>
+
+      <div class="game-board">
+        <!-- Top players (faceUp visible, faceDown hidden) -->
+        <div id="opponents-area" class="opponents-area"></div>
+
+        <!-- Center area: pile + deck -->
+        <div class="center-area">
+          <div class="pile-container">
+            <div class="pile-label">Pile</div>
+            <div id="pile" class="pile"></div>
+          </div>
+          <div class="deck-container">
+            <div class="deck-label">Deck: <span id="deck-count">0</span></div>
+            <div id="deck" class="deck"></div>
+          </div>
+        </div>
+
+        <!-- Current player area -->
+        <div id="current-player-area" class="current-player-area">
+          <div class="player-header">
+            <span class="player-name"></span>
+            <span class="card-count"></span>
+          </div>
+          <div class="player-cards">
+            <div class="card-section">
+              <div class="section-label">Hand</div>
+              <div id="current-hand" class="card-row hand"></div>
+            </div>
+            <div class="card-section">
+              <div class="section-label">Face Up</div>
+              <div id="current-face-up" class="card-row face-up"></div>
+            </div>
+            <div class="card-section">
+              <div class="section-label">Face Down</div>
+              <div id="current-face-down" class="card-row face-down"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Status message -->
+      <div id="status-message" class="status-message"></div>
     </div>
 
-    <div class="accordion">
-      <details>
-        <summary>
-          <span role="term">Objective</span>
-        </summary>
-      </details>
-      <div class="content">
-        <p class="inner" role="definition" id="accordion2">
-          Players must strategically manage their hand and table cards to outplay their 
-          opponents. The first player to empty their hand and table wins the game.
-        </p>
+    <!-- Win Modal -->
+    <div id="win-modal" class="modal hidden">
+      <div class="modal-content">
+        <h2 id="winner-name">Winner!</h2>
+        <p>Congratulations!</p>
+        <button id="play-again-btn">Play Again</button>
       </div>
     </div>
-
-    <button>Start Game</button>
-
   </body>
 </html>

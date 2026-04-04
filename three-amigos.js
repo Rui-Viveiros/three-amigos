@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------
-const POWER = {
+export const POWER = {
   CHOOSE_NEXT: 'CHOOSE_NEXT',
   NEXT: 'NEXT',
   PLAY_MINOR: 'PLAY_MINOR',
@@ -8,7 +8,7 @@ const POWER = {
   NONE: false
 };
 
-export class Card {
+class Card {
   constructor(value, suit) {
     this.value = value;
     this.suit = suit;
@@ -27,7 +27,7 @@ export class Card {
 
 // ---------------------------------------------------------------
 
-export class Deck {
+class Deck {
   constructor() {
     this.cards = [];
     this.discardedPile = [];
@@ -70,7 +70,7 @@ export class Deck {
   }
 }
 
-export class Player {
+class Player {
   constructor(name) {
     this.name = name;
     this.hand = [];
@@ -91,7 +91,7 @@ export class Player {
   }
 }
 
-export class Game {
+class Game {
   constructor(playerNames, deck) {
     this.players = playerNames.map((name) => new Player(name));
     this.deck = deck;
@@ -163,7 +163,23 @@ export class Game {
   clean() {
     this.deck.discardedPile.push(...this.board);
     this.board = [];
+    this.freePlay = true; // Play again after cleaning
     return true;
+  }
+
+  checkPileCleanup() {
+    if (this.board.length < 4) return false;
+
+    // Check last 4 cards for same value
+    const lastFour = this.board.slice(-4);
+    if (lastFour.every(card => card.value === lastFour[0].value)) {
+      this.deck.discardedPile.push(...this.board);
+      this.board = [];
+      this.freePlay = true;
+      console.log(`Pile cleaned! Four ${lastFour[0].value}'s played. Play again!`);
+      return true;
+    }
+    return false;
   }
 
   resetTurnRestrictions() {
@@ -171,9 +187,7 @@ export class Game {
     this.minPlayValue = 1;
     this.maxPlayValue = 13;
     this.awaitingChoiceNext = false;
-    for (const player of this.players) {
-      player.skipped = false;
-    }
+    // Note: we do NOT clear skipped flags here - that's done when skipped player takes turn
   }
 
   isValidPlay(card) {
@@ -194,14 +208,190 @@ export class Game {
       return false;
     }
 
+    // Ace (1) can be played on any card except 7
+    if (card.value === 1) {
+      if (this.board.length === 0) return true; // Ace can start pile
+      const topCard = this.board[this.board.length - 1];
+      if (topCard.value !== 7) return true; // Ace beats anything except 7
+      return false; // Can't play Ace on 7
+    }
+
     // Must beat or equal the top board card
     if (this.board.length > 0) {
       const topCard = this.board[this.board.length - 1];
+
+      // When Ace (1) is on pile, only Ace or 2 can be played
+      if (topCard.value === 1) {
+        if (card.value !== 1 && card.value !== 2) {
+          return false;
+        }
+        return true;
+      }
+
       if (card.value < topCard.value) {
         return false;
       }
     }
 
+    return true;
+  }
+
+  canPlay(pile = 'hand') {
+    const player = this.currentPlayer;
+    let cards;
+
+    if (pile === 'hand') {
+      cards = player.hand;
+    } else if (pile === 'faceUp') {
+      cards = player.faceUp;
+    } else if (pile === 'faceDown') {
+      if (player.faceUp.length > 0) return false;
+      cards = player.faceDown;
+    }
+
+    return cards.some(card => this.isValidPlay(card));
+  }
+
+  getPlayableCards(pile = 'hand') {
+    const player = this.currentPlayer;
+    let cards;
+
+    if (pile === 'hand') {
+      cards = player.hand;
+    } else if (pile === 'faceUp') {
+      cards = player.faceUp;
+    } else if (pile === 'faceDown') {
+      if (player.faceUp.length > 0) return [];
+      cards = player.faceDown;
+    }
+
+    return cards.filter(card => this.isValidPlay(card));
+  }
+
+  playMultiple(pile, value) {
+    const player = this.currentPlayer;
+    let source;
+
+    if (pile === 'hand') source = player.hand;
+    else if (pile === 'faceUp') source = player.faceUp;
+    else if (pile === 'faceDown') {
+      if (player.faceUp.length > 0) return false;
+      source = player.faceDown;
+    }
+
+    // Find all cards of this value that are valid plays
+    const matchingCards = source.filter(card => card.value === value && this.isValidPlay(card));
+
+    if (matchingCards.length < 2) return false;
+
+    // Remove all matching cards from source
+    const playedCards = [];
+    for (let i = source.length - 1; i >= 0; i--) {
+      if (source[i].value === value && this.isValidPlay(source[i])) {
+        playedCards.push(source.splice(i, 1)[0]);
+      }
+    }
+
+    if (playedCards.length < 2) {
+      // Put cards back if less than 2
+      source.push(...playedCards);
+      return false;
+    }
+
+    this.board.push(...playedCards);
+
+    // Check for 4-of-a-kind cleanup when playing multiple
+    if (playedCards.length === 4) {
+      this.deck.discardedPile.push(...this.board);
+      this.board = [];
+      this.freePlay = true;
+      console.log(`Four ${playedCards[0].value}'s played together! Pile cleaned!`);
+      return playedCards;
+    }
+
+    return playedCards;
+  }
+
+  // Returns info about what source the player can play from
+  getTurnAction() {
+    const player = this.currentPlayer;
+
+    if (player.skipped) {
+      return { action: 'skip' };
+    }
+
+    if (this.canPlay('hand')) {
+      return { action: 'play', pile: 'hand' };
+    }
+
+    if (player.faceUp.length > 0 && this.canPlay('faceUp')) {
+      return { action: 'play', pile: 'faceUp' };
+    }
+
+    if (player.faceDown.length > 0 && this.canPlay('faceDown')) {
+      return { action: 'play', pile: 'faceDown' };
+    }
+
+    return { action: 'pickup' };
+  }
+
+  takeTurn() {
+    const player = this.currentPlayer;
+
+    // Check if player was blocked (by an 8) - clear flag and skip them
+    if (player.skipped) {
+      console.log(`${player.name} is blocked and skips their turn.`);
+      player.skipped = false; // Clear the blocked flag
+      this.resetTurnRestrictions();
+      this.nextTurn();
+      this.drawPhase();
+      return { action: 'skip' };
+    }
+
+    const turnAction = this.getTurnAction();
+
+    if (turnAction.action === 'pickup') {
+      this.pickUpBoard();
+      this.drawPhase();
+      return { action: 'pickup' };
+    }
+
+    // Player has valid play(s) available
+    return turnAction;
+  }
+
+  playAndAdvance(pile, index) {
+    const result = this.play(pile, index);
+    if (!result) return false;
+
+    // Check for pile cleanup after playing
+    this.checkPileCleanup();
+
+    // Draw back up to 3 after playing (if deck has cards and turn continues)
+    this.drawPhase();
+
+    return true;
+  }
+
+  playMultipleAndAdvance(pile, value) {
+    const playedCards = this.playMultiple(pile, value);
+    if (!playedCards) return false;
+
+    // Check for pile cleanup (already handled in playMultiple for 4 cards)
+
+    // Draw back up to 3 after playing
+    this.drawPhase();
+
+    return playedCards;
+  }
+
+  pickUpBoard() {
+    const player = this.currentPlayer;
+    player.hand.push(...this.board);
+    this.board = [];
+    this.resetTurnRestrictions();
+    this.nextTurn();
+    console.log(`${player.name} picks up ${player.hand.length - this.board.length} cards.`);
     return true;
   }
 
@@ -218,8 +408,11 @@ export class Game {
     }
 
     if (!this.isValidPlay(card)) {
-      player.hand.push(card);
-      return false;
+      // Put card back and pick up board
+      if (pile === 'hand') player.hand.push(card);
+      else if (pile === 'faceUp') player.faceUp.push(card);
+      else if (pile === 'faceDown') player.faceDown.push(card);
+      return this.pickUpBoard();
     }
 
     this.board.push(card);
@@ -232,8 +425,22 @@ export class Game {
       return true;
     }
 
+    const wasBlocked = power === POWER.BLOCKED;
+    const wasCleaned = power === POWER.CLEAN;
     this.applyCardPower(card);
-    this.resetTurnRestrictions();
+
+    // Only reset restrictions if NOT blocked and NOT cleaned
+    // (blocked player needs to be skipped, and cleaned player gets another turn)
+    if (!wasBlocked && !wasCleaned) {
+      this.resetTurnRestrictions();
+    } else if (wasCleaned) {
+      // Clean keeps freePlay = true, just reset other restrictions
+      this.freePlay = true;
+      this.minPlayValue = 1;
+      this.maxPlayValue = 13;
+      this.awaitingChoiceNext = false;
+    }
+
     this.nextTurn();
 
     this.checkWin();
@@ -249,7 +456,9 @@ export class Game {
     const drawCount = 3 - player.hand.length;
     if (drawCount > 0 && this.deck.size > 0) {
       const drawn = this.deck.draw(drawCount);
-      player.hand.push(...drawn.filter(c => c !== undefined));
+      // draw() returns single card when count=1, array when count>1
+      const cards = Array.isArray(drawn) ? drawn : [drawn];
+      player.hand.push(...cards.filter(c => c !== undefined));
     }
   }
 
